@@ -58,6 +58,7 @@
         footer { background: #1e293b; border-top: 1px solid #334155; padding: 2rem 0; margin-top: 4rem; text-align: center; color: #64748b; }
         @media (max-width: 768px) { .hero { padding: 40px 20px; } .module-content { padding: 20px; } }
     </style>
+<script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
     <nav>
@@ -681,7 +682,7 @@
             document.getElementById(pageId).classList.add('active');
         }
 
-    async function upgradeClick(plan) {
+   async function upgradeClick(plan) {
     try {
         const response = await fetch('/api/create-checkout-session', {
             method: 'POST',
@@ -698,8 +699,9 @@
             return;
         }
 
-        // Redirige vers Stripe Checkout
-        window.location.href = `https://checkout.stripe.com/pay/${sessionId}`;
+        // Utilise Stripe.js pour rediriger
+        const stripe = Stripe('pk_test_51TKiCoBi6rAFPbigi8dgeBjTnQ5vLAkXXy0DmKK6k1ETTbxsxmBj7nr87wQaXSrSmLBcbGs2V0n2Sw7sSEeR5X400UT6lPG48');
+        await stripe.redirectToCheckout({ sessionId });
     } catch (err) {
         alert(`Erreur: ${err.message}`);
     }
