@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi Academy - Master Yield Farming</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%); color: #e2e8f0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        nav { background: #1e293b; border-bottom: 1px solid #334155; padding: 1rem 0; position: sticky; top: 0; z-index: 50; margin-bottom: 2rem; }
+        nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: bold; cursor: pointer; color: white; }
+        .nav-buttons { display: flex; gap: 20px; align-items: center; }
+        .nav-buttons button { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 14px; }
+        .nav-buttons button:hover { color: white; }
+        .points-badge { background: #334155; color: #60a5fa; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .hero { background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border-radius: 16px; padding: 60px 40px; margin-bottom: 40px; border: 1px solid #334155; }
+        .hero h1 { font-size: 48px; font-weight: bold; margin-bottom: 20px; color: white; }
+        .hero p { font-size: 18px; color: #cbd5e1; margin-bottom: 30px; }
+        button { padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; }
+        .btn-primary { background: white; color: #0f172a; }
+        .btn-primary:hover { background: #f1f5f9; }
+        .module-content { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        .module-header h1 { color: white; font-size: 36px; margin-bottom: 10px; }
+        .lesson-item { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .lesson-title { color: white; font-weight: 600; font-size: 16px; margin-bottom: 8px; }
+        .lesson-desc { color: #94a3b8; font-size: 14px; margin-bottom: 12px; }
+        .quiz-section { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .quiz-section h3 { color: white; margin-bottom: 15px; }
+        .quiz-question { margin-bottom: 20px; }
+        .quiz-question p { color: white; font-weight: 600; margin-bottom: 12px; }
+        .quiz-option { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; }
+        .quiz-option:hover { border-color: #60a5fa; }
+        .quiz-option input { margin-right: 12px; }
+        .quiz-option label { cursor: pointer; color: #cbd5e1; flex: 1; }
+        .quiz-button { background: #3b82f6; color: white; margin-top: 10px; }
+        .quiz-button:hover { background: #2563eb; }
+        .quiz-result { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; }
+        .quiz-result.show { display: block; }
+        .quiz-result.correct { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; }
+        .quiz-result.incorrect { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; }
+        .videos-section { margin-bottom: 30px; }
+        .videos-section h3 { color: white; margin-bottom: 15px; }
+        .video-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .video-item { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 15px; text-align: center; }
+        .video-item a { color: #60a5fa; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .video-item a:hover { text-decoration: underline; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; transition: all 0.3s; }
+        .card:hover { border-color: #64748b; transform: translateY(-4px); }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .back-button { background: transparent; color: #60a5fa; border: none; cursor: pointer; font-size: 14px; margin-bottom: 20px; padding: 0; }
+        .paywall { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid #3b82f6; border-radius: 12px; padding: 32px; margin: 40px 0; text-align: center; }
+        .paywall h2 { color: white; margin-bottom: 12px; }
+        footer { background: #1e293b; border-top: 1px solid #334155; padding: 2rem 0; margin-top: 4rem; text-align: center; color: #64748b; }
+        @media (max-width: 768px) { .hero { padding: 40px 20px; } .module-content { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo" onclick="showPage('home')">🚀 DeFi Academy</div>
+            <div class="nav-buttons">
+                <button onclick="showPage('modules')">Modules</button>
+                <button onclick="showPage('leaderboard')">Leaderboard</button>
+                <div class="points-badge" id="pointsBadge">0 pts</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="home" class="page active">
+            <div class="hero">
+                <h1>Master DeFi in 8 Modules</h1>
+                <p>Learn yield farming, liquidity pools, and advanced strategies with real-time data from Krystal.</p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn-primary" onclick="showPage('modules')">Start Learning</button>
+                    <button style="background: transparent; border: 1px solid #cbd5e1; color: white;" onclick="showPage('leaderboard')">View Leaderboard</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modules" class="page">
+            <h1 style="color: white; margin-bottom: 30px;">8-Module Curriculum</h1>
+            <div id="modulesGrid" class="cards-grid"></div>
+        </div>
+
+        <div id="module-detail" class="page">
+            <button class="back-button" onclick="showPage('modules')">← Back</button>
+            <div id="moduleDetail"></div>
+        </div>
+
+        <div id="leaderboard" class="page">
+            <h1 style="color: white; margin-bottom: 30px;">Global Leaderboard</h1>
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden;">
+                <table id="leaderboardTable" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #0f172a;">
+                            <th style="padding: 16px; text-align: left; color: #94a3b8;">Rank</th>
+                            <th style="padding: 16px; text-align: left; color: #94a3b8;">Name</th>
+                            <th style="padding: 16px; text-align: right; color: #94a3b8;">Points</th>
+                            <th style="padding: 16px; text-align: right; color: #94a3b8;">Streak</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>🔐 DeFi Academy | Real-time data from Coingecko, DeFi Llama & Krystal</p>
+        <p>Learn. Earn. Dominate. 📊</p>
+    </footer>
+
+    <script>
+        const modules = [
+            {
+                id: 1,
+                title: "DeFi Fundamentals",
+                desc: "Learn what DeFi is, blockchain basics",
+                isPremium: false,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "What is DeFi?",
+                        description: "Understand decentralized finance and why it's changing money",
+                        videos: [
+                            { title: "DeFi Explained in 5 min", query: "what is defi cryptocurrency" },
+                            { title: "DeFi vs Traditional Finance", query: "defi vs traditional banking" },
+                            { title: "Why DeFi Matters", query: "why cryptocurrency defi important" }
+                        ],
+                        quiz: [
+                            { q: "DeFi stands for?", a: "Decentralized Finance", options: ["Decentralized Finance", "Digital Finance", "Direct Finance"] },
+                            { q: "DeFi removes what?", a: "Middlemen like banks", options: ["Middlemen like banks", "Regulations", "Cryptocurrencies"] },
+                            { q: "What is the main benefit of DeFi?", a: "Financial freedom without banks", options: ["Getting rich quick", "Financial freedom without banks", "Lower fees only"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Blockchain Basics",
+                        description: "How blockchain technology works",
+                        videos: [
+                            { title: "What is Blockchain?", query: "how does blockchain work" },
+                            { title: "Blocks & Transactions", query: "blockchain blocks transactions explained" },
+                            { title: "Smart Contracts", query: "smart contracts blockchain explained" }
+                        ],
+                        quiz: [
+                            { q: "Blockchain is?", a: "A distributed ledger", options: ["A distributed ledger", "A single server", "A bank database"] },
+                            { q: "Bitcoin uses which hash?", a: "SHA-256", options: ["SHA-256", "MD5", "AES-256"] }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Crypto Wallets",
+                        description: "Understand public/private keys and wallet security",
+                        videos: [
+                            { title: "Crypto Wallets 101", query: "cryptocurrency wallet explained" },
+                            { title: "Hot vs Cold Wallets", query: "hot wallet vs cold wallet security" },
+                            { title: "Private Keys Explained", query: "private keys cryptocurrency security" }
+                        ],
+                        quiz: [
+                            { q: "What should you NEVER share?", a: "Your private key", options: ["Your public address", "Your private key", "Your wallet name"] },
+                            { q: "Hot wallet is?", a: "Connected to internet", options: ["Connected to internet", "Completely offline", "A cold storage device"] }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Wallets & Solana 101",
+                desc: "Set up wallets, understand SPL tokens",
+                isPremium: false,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "Solana Ecosystem",
+                        description: "Introduction to Solana blockchain",
+                        videos: [
+                            { title: "What is Solana?", query: "solana blockchain explained" },
+                            { title: "Solana vs Ethereum", query: "solana vs ethereum comparison" },
+                            { title: "Why Solana is Fast", query: "solana proof of history speed" }
+                        ],
+                        quiz: [
+                            { q: "Solana's consensus is?", a: "Proof of History", options: ["Proof of Work", "Proof of History", "Proof of Stake"] },
+                            { q: "Solana transaction speed?", a: "65,000+ per second", options: ["100 per second", "1,000 per second", "65,000+ per second"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Phantom Wallet Setup",
+                        description: "Create and secure your Phantom wallet",
+                        videos: [
+                            { title: "Phantom Wallet Tutorial", query: "phantom wallet setup solana" },
+                            { title: "Importing Accounts", query: "phantom wallet import private key" },
+                            { title: "Wallet Security", query: "phantom wallet security best practices" }
+                        ],
+                        quiz: [
+                            { q: "Phantom wallet is a?", a: "Browser extension", options: ["Hardware device", "Browser extension", "Bank account"] },
+                            { q: "Where should you store your seed phrase?", a: "Offline, in a safe place", options: ["In your email", "Offline, in a safe place", "On your computer"] }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "SPL Tokens",
+                        description: "Understand Solana's token standard",
+                        videos: [
+                            { title: "What are SPL Tokens?", query: "solana spl tokens explained" },
+                            { title: "Creating SPL Tokens", query: "how to create spl token solana" },
+                            { title: "Token Transfers", query: "solana spl token transfer transaction" }
+                        ],
+                        quiz: [
+                            { q: "SPL is similar to which Ethereum standard?", a: "ERC-20", options: ["ERC-721", "ERC-20", "ERC-1155"] },
+                            { q: "SPL stands for?", a: "Solana Program Library", options: ["Simple Protocol Layer", "Solana Program Library", "Smart Protocol Language"] }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Tokens & Swaps",
+                desc: "Master token economics and DEX swaps",
+                isPremium: true,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "Token Economics",
+                        description: "Supply, demand, and price mechanics",
+                        videos: [
+                            { title: "Token Supply & Demand", query: "cryptocurrency token supply demand price" },
+                            { title: "Market Cap vs Price", query: "crypto market cap vs price explained" },
+                            { title: "Token Inflation", query: "cryptocurrency inflation tokenomics" }
+                        ],
+                        quiz: [
+                            { q: "Higher supply = ?", a: "Usually lower price (if demand constant)", options: ["Higher price always", "Usually lower price (if demand constant)", "No effect"] },
+                            { q: "Market cap = ?", a: "Price × Circulating supply", options: ["Price × Total supply", "Price × Circulating supply", "Price only"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Decentralized Exchanges (DEX)",
+                        description: "How DEXs work vs centralized exchanges",
+                        videos: [
+                            { title: "What is a DEX?", query: "decentralized exchange dex explained" },
+                            { title: "DEX vs CEX", query: "dex vs cex cryptocurrency exchange" },
+                            { title: "How AMMs Work", query: "automated market maker amm uniswap" }
+                        ],
+                        quiz: [
+                            { q: "DEX stands for?", a: "Decentralized Exchange", options: ["Digital Exchange", "Decentralized Exchange", "Derivative Exchange"] },
+                            { q: "DEXs use which mechanism?", a: "Automated Market Maker (AMM)", options: ["Order book", "Automated Market Maker (AMM)", "Manual pricing"] }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Executing Swaps on Jupiter",
+                        description: "Trade tokens on Solana's best DEX aggregator",
+                        videos: [
+                            { title: "Jupiter DEX Tutorial", query: "jupiter dex solana how to swap" },
+                            { title: "Slippage Settings", query: "crypto slippage tolerance trading" },
+                            { title: "Gas Fees & Costs", query: "solana transaction fee gas cost" }
+                        ],
+                        quiz: [
+                            { q: "Jupiter is a?", a: "DEX aggregator", options: ["Single DEX", "DEX aggregator", "Centralized exchange"] },
+                            { q: "Slippage is?", a: "Price change during execution", options: ["Fee you pay", "Price change during execution", "Wallet balance"] }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Liquidity Pools & LPs",
+                desc: "Understand AMMs and provide liquidity",
+                isPremium: true,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "How Liquidity Pools Work",
+                        description: "The mechanics of automated market makers",
+                        videos: [
+                            { title: "Liquidity Pools Explained", query: "liquidity pools cryptocurrency explained" },
+                            { title: "Constant Product Formula", query: "uniswap constant product formula amm" },
+                            { title: "Price Discovery", query: "amm price discovery cryptocurrency" }
+                        ],
+                        quiz: [
+                            { q: "In a 50/50 pool, if SOL doubles, USDC ratio becomes?", a: "Less than 50%", options: ["More than 50%", "Exactly 50%", "Less than 50%"] },
+                            { q: "LP tokens represent?", a: "Your share of the pool", options: ["The blockchain", "Your share of the pool", "Gas fees"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Impermanent Loss (IL)",
+                        description: "Understand the cost of providing liquidity",
+                        videos: [
+                            { title: "Impermanent Loss Explained", query: "impermanent loss liquidity mining" },
+                            { title: "Calculating IL", query: "how to calculate impermanent loss" },
+                            { title: "When IL Matters", query: "impermanent loss volatile pairs" }
+                        ],
+                        quiz: [
+                            { q: "IL happens when?", a: "Token prices diverge significantly", options: ["You withdraw liquidity", "Token prices diverge significantly", "Gas fees increase"] },
+                            { q: "IL is permanent if?", a: "You don't exit at the same price ratio", options: ["It's always permanent", "You don't exit at the same price ratio", "You withdraw immediately"] }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Providing Liquidity on Orca",
+                        description: "Step-by-step guide to become an LP",
+                        videos: [
+                            { title: "Orca LP Tutorial", query: "orca dex liquidity provider tutorial" },
+                            { title: "Fee Tier Selection", query: "liquidity pool fee tier selection" },
+                            { title: "Managing LP Positions", query: "managing liquidity pool position" }
+                        ],
+                        quiz: [
+                            { q: "Equal value deposits mean?", a: "50/50 ratio of tokens", options: ["Any ratio", "50/50 ratio of tokens", "Unequal amounts"] }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Yield Farming Mastery",
+                desc: "Maximize APY with real Krystal data",
+                isPremium: true,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "Yield Farming Basics",
+                        description: "Earn yields by providing liquidity",
+                        videos: [
+                            { title: "What is Yield Farming?", query: "cryptocurrency yield farming explained" },
+                            { title: "Farming APY Calculation", query: "how to calculate yield farming apy" },
+                            { title: "Farming vs Staking", query: "yield farming vs staking crypto" }
+                        ],
+                        quiz: [
+                            { q: "Yield farming income comes from?", a: "Trading fees + rewards", options: ["Trading fees + rewards", "Only transaction fees", "Only protocol rewards"] },
+                            { q: "Higher APY means?", a: "More return in percent", options: ["Guaranteed profit", "More return in percent", "Less risk"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Krystal Protocol Deep Dive",
+                        description: "Master Krystal's yield optimization",
+                        videos: [
+                            { title: "What is Krystal?", query: "krystal finance solana yield farming" },
+                            { title: "Krystal Vaults", query: "krystal vaults strategy explained" },
+                            { title: "ROI Optimization", query: "yield farming roi optimization strategy" }
+                        ],
+                        quiz: [
+                            { q: "Krystal's main advantage is?", a: "Automated yield optimization", options: ["Lowest fees", "Automated yield optimization", "Highest APY always"] },
+                            { q: "Auto-compounding in Krystal?", a: "Reinvests rewards automatically", options: ["Manual only", "Reinvests rewards automatically", "Not available"] }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Risk-Return Analysis",
+                        description: "Choose farms based on risk profile",
+                        videos: [
+                            { title: "Evaluating Farm Risk", query: "defi farm risk assessment" },
+                            { title: "Rug Pull Red Flags", query: "cryptocurrency rug pull warning signs" },
+                            { title: "Safe Yield Farming", query: "safe yield farming strategies" }
+                        ],
+                        quiz: [
+                            { q: "Higher APY usually means?", a: "Higher risk", options: ["Lower risk", "Higher risk", "No risk"] },
+                            { q: "New token farms are?", a: "High risk, high reward", options: ["Always profitable", "High risk, high reward", "No risk"] }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Risk Management",
+                desc: "Identify and mitigate DeFi risks",
+                isPremium: true,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "Smart Contract Audits",
+                        description: "Evaluate protocol security",
+                        videos: [
+                            { title: "What is an Audit?", query: "smart contract audit security" },
+                            { title: "Reading Audit Reports", query: "how to read smart contract audit" },
+                            { title: "Audit Red Flags", query: "dangerous smart contract vulnerabilities" }
+                        ],
+                        quiz: [
+                            { q: "Audits guarantee?", a: "Reduce risk significantly", options: ["100% safety", "Reduce risk significantly", "Free money"] },
+                            { q: "Multiple audits mean?", a: "Higher confidence in security", options: ["Guaranteed safety", "Higher confidence in security", "More expensive"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Portfolio Diversification",
+                        description: "Spread risk across protocols",
+                        videos: [
+                            { title: "DeFi Portfolio Strategy", query: "cryptocurrency portfolio diversification" },
+                            { title: "Correlation Analysis", query: "crypto asset correlation risk" },
+                            { title: "Rebalancing", query: "portfolio rebalancing strategy" }
+                        ],
+                        quiz: [
+                            { q: "Don't put all capital in?", a: "One protocol", options: ["Stablecoins", "One protocol", "Bonds"] }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Emergency Protocols",
+                        description: "How to respond to market crashes",
+                        videos: [
+                            { title: "Market Crash Response", query: "crypto market crash what to do" },
+                            { title: "Liquidation Protection", query: "defi liquidation protection" },
+                            { title: "Exit Strategies", query: "when to exit losing positions" }
+                        ],
+                        quiz: [
+                            { q: "In a crash, should you?", a: "Execute stop losses", options: ["Panic sell", "Execute stop losses", "Do nothing"] }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Advanced Strategies",
+                desc: "Multi-leg strategies and hedging",
+                isPremium: true,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "Leveraged Yield Farming",
+                        description: "Amplify returns with leverage",
+                        videos: [
+                            { title: "Leveraged Farming Explained", query: "leveraged yield farming defi" },
+                            { title: "Flash Loans", query: "flash loans defi explained" },
+                            { title: "Leverage Risks", query: "leverage trading risks crypto" }
+                        ],
+                        quiz: [
+                            { q: "2x leverage means?", a: "Double risk and reward", options: ["Double only reward", "Double risk and reward", "Half risk"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Hedging Strategies",
+                        description: "Protect against downside",
+                        videos: [
+                            { title: "Hedging in Crypto", query: "cryptocurrency hedging strategies" },
+                            { title: "Perpetual Contracts", query: "perpetual futures contracts defi" },
+                            { title: "Options Trading", query: "crypto options explained" }
+                        ],
+                        quiz: [
+                            { q: "Hedging costs?", a: "Some return to reduce risk", options: ["Nothing", "Some return to reduce risk", "Everything"] }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "DeFi Case Studies",
+                desc: "Real incidents and best practices",
+                isPremium: true,
+                lessons: [
+                    {
+                        id: 1,
+                        title: "Famous DeFi Hacks",
+                        description: "Learn from past incidents",
+                        videos: [
+                            { title: "The DAO Hack", query: "the dao hack 2016 ethereum" },
+                            { title: "Flash Loan Attacks", query: "flash loan attack defi" },
+                            { title: "Rug Pull Examples", query: "crypto rug pull case study" }
+                        ],
+                        quiz: [
+                            { q: "The DAO hack cost?", a: "Millions in ETH", options: ["Thousands", "Millions in ETH", "Billions"] }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Success Stories",
+                        description: "Profitable strategies that worked",
+                        videos: [
+                            { title: "Early Uniswap LPs", query: "uniswap liquidity provider profits" },
+                            { title: "Compound Finance Success", query: "compound finance lending success" },
+                            { title: "Aave Impact", query: "aave protocol defi lending" }
+                        ],
+                        quiz: [
+                            { q: "Early Uniswap LPs earned mainly from?", a: "Trading fees", options: ["Token airdrops", "Trading fees", "Borrowing interest"] }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Future of DeFi",
+                        description: "Trends and predictions",
+                        videos: [
+                            { title: "DeFi Roadmap", query: "defi future trends 2024 2025" },
+                            { title: "Cross-Chain DeFi", query: "cross chain defi explained" },
+                            { title: "Real World Assets", query: "real world assets defi tokenization" }
+                        ],
+                        quiz: [
+                            { q: "Next DeFi frontier?", a: "Cross-chain and RWA", options: ["Higher APY", "Cross-chain and RWA", "More leverage"] }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let user = {
+            name: 'Learner',
+            points: 0,
+            streak: 0,
+            moduleProgress: [0, 0, 0, 0, 0, 0, 0, 0],
+            isPremium: false,
+            completedQuizzes: {}
+        };
+
+        function loadUser() {
+            const saved = localStorage.getItem('defiUser');
+            if (saved) user = JSON.parse(saved);
+            updateUI();
+        }
+
+        function saveUser() {
+            localStorage.setItem('defiUser', JSON.stringify(user));
+        }
+
+        function updateUI() {
+            document.getElementById('pointsBadge').textContent = user.points + ' pts';
+            renderModules();
+            renderLeaderboard();
+        }
+
+        function renderModules() {
+            const grid = document.getElementById('modulesGrid');
+            grid.innerHTML = '';
+            modules.forEach(mod => {
+                const isLocked = mod.isPremium && !user.isPremium;
+                const progress = user.moduleProgress[mod.id - 1] || 0;
+                const card = document.createElement('div');
+                card.className = 'card';
+                if (isLocked) card.style.opacity = '0.5';
+                card.innerHTML = `
+                    <h3 style="color: white; font-size: 18px;">${mod.title}</h3>
+                    <p style="color: #94a3b8; font-size: 14px; margin: 8px 0;">${mod.desc}</p>
+                    <div style="color: #64748b; font-size: 12px; margin: 10px 0;">
+                        ${mod.lessons.length} lessons • ${mod.lessons.reduce((sum, l) => sum + (l.videos?.length || 0), 0)} videos • ${mod.lessons.reduce((sum, l) => sum + (l.quiz?.length || 0), 0)} quizzes
+                    </div>
+                    ${progress > 0 ? `<p style="color: #94a3b8; font-size: 12px;">${progress}% complete</p>` : ''}
+                    <button class="btn-primary" onclick="openModule(${mod.id})" style="width: 100%; margin-top: 12px; ${isLocked ? 'opacity: 0.5;' : ''}">
+                        ${isLocked ? 'Locked' : 'Learn More'}
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+
+            if (!user.isPremium) {
+                const paywall = document.createElement('div');
+                paywall.className = 'paywall';
+                paywall.style.gridColumn = '1 / -1';
+                paywall.innerHTML = `
+                    <h2>🚀 Unlock Premium Access</h2>
+                    <p style="margin-bottom: 20px;">Get access to 6 premium modules + 50+ quizzes + 100+ videos</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+                        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; flex: 1; min-width: 200px;">
+                            <h3 style="color: white; margin-bottom: 10px;">Monthly</h3>
+                            <p style="font-size: 28px; color: #60a5fa; font-weight: bold; margin-bottom: 10px;">$9.99<span style="font-size: 14px; color: #94a3b8;">/month</span></p>
+                            <button class="btn-primary" onclick="upgradeClick('monthly')" style="width: 100%; margin-top: 10px;">Choose Plan</button>
+                        </div>
+                        <div style="background: #0f172a; border: 2px solid #10b981; border-radius: 12px; padding: 20px; flex: 1; min-width: 200px; position: relative;">
+                            <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">BEST VALUE</div>
+                            <h3 style="color: white; margin-bottom: 10px;">Annual</h3>
+                            <p style="font-size: 28px; color: #10b981; font-weight: bold; margin-bottom: 5px;">$99<span style="font-size: 14px; color: #94a3b8;">/year</span></p>
+                            <p style="font-size: 12px; color: #10b981; margin-bottom: 10px;">Save $20 (17% off)</p>
+                            <button class="btn-primary" onclick="upgradeClick('annual')" style="width: 100%; margin-top: 10px; background: #10b981; color: white;">Choose Plan</button>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: #94a3b8;">💳 Secure payment by Stripe</p>
+                `;
+                grid.appendChild(paywall);
+            }
+        }
+
+        function openModule(moduleId) {
+            const mod = modules[moduleId - 1];
+            if (mod.isPremium && !user.isPremium) {
+                alert('Premium module - Upgrade to access!');
+                return;
+            }
+
+            let html = `<div class="module-content"><h1 style="color: white; margin-bottom: 20px;">${mod.title}</h1>`;
+
+            mod.lessons.forEach((lesson, idx) => {
+                html += `
+                    <div class="lesson-item">
+                        <h3 class="lesson-title">Lesson ${idx + 1}: ${lesson.title}</h3>
+                        <p class="lesson-desc">${lesson.description}</p>
+                `;
+
+                if (lesson.videos?.length > 0) {
+                    html += `<div class="videos-section"><h4 style="color: #60a5fa; margin-bottom: 10px;">📹 Videos</h4><div class="video-list">`;
+                    lesson.videos.forEach(v => {
+                        html += `<div class="video-item"><a href="https://youtube.com/results?search_query=${encodeURIComponent(v.query)}" target="_blank">▶️ ${v.title}</a></div>`;
+                    });
+                    html += `</div></div>`;
+                }
+
+                if (lesson.quiz?.length > 0) {
+                    const quizId = `q-${moduleId}-${idx}`;
+                    html += `<div class="quiz-section"><h4 style="color: white; margin-bottom: 15px;">✅ Quiz (${lesson.quiz.length} questions)</h4>`;
+                    lesson.quiz.forEach((q, qi) => {
+                        html += `<div class="quiz-question"><p>${qi + 1}. ${q.q}</p>`;
+                        q.options.forEach((opt, oi) => {
+                            html += `<div class="quiz-option"><input type="radio" name="${quizId}" value="${opt}" id="${quizId}-${oi}"><label for="${quizId}-${oi}">${opt}</label></div>`;
+                        });
+                        html += `</div>`;
+                    });
+                    html += `<button class="quiz-button" onclick="submitQuiz(${moduleId}, ${idx}, '${quizId}')">Submit Quiz</button><div class="quiz-result" id="${quizId}-result"></div></div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            html += `<button class="btn-primary" onclick="completeModule(${moduleId})" style="width: 100%; padding: 15px; margin-top: 30px;">✅ Complete Module & Earn 250 Points</button></div>`;
+
+            document.getElementById('moduleDetail').innerHTML = html;
+            showPage('module-detail');
+        }
+
+        function submitQuiz(moduleId, lessonId, quizId) {
+            const quiz = modules[moduleId - 1].lessons[lessonId].quiz;
+            let correct = 0;
+            quiz.forEach((q, idx) => {
+                const ans = document.querySelector(`input[name="${quizId}"]:checked`);
+                if (ans?.value === q.a) correct++;
+            });
+
+            const resultEl = document.getElementById(`${quizId}-result`);
+            if (correct >= quiz.length * 0.8) {
+                resultEl.className = 'quiz-result show correct';
+                resultEl.innerHTML = `✅ ${correct}/${quiz.length} correct! +50 points!`;
+                user.points += 50;
+            } else {
+                resultEl.className = 'quiz-result show incorrect';
+                resultEl.innerHTML = `❌ ${correct}/${quiz.length}. Review and try again!`;
+            }
+            saveUser();
+            document.getElementById('pointsBadge').textContent = user.points + ' pts';
+        }
+
+        function completeModule(moduleId) {
+            user.moduleProgress[moduleId - 1] = 100;
+            user.points += 250;
+            user.streak++;
+            saveUser();
+            alert('✅ +250 points! You earned a streak! 🔥');
+            updateUI();
+            showPage('modules');
+        }
+
+        function renderLeaderboard() {
+            const board = [
+                { rank: 1, name: 'CryptoNinja', points: 8540, streak: 23 },
+                { rank: 2, name: 'DeFiMaster', points: 7820, streak: 19 },
+                { rank: 3, name: 'YieldHunter', points: 6950, streak: 16 },
+                { rank: 4, name: 'BlockchainPro', points: 5430, streak: 12 },
+                { rank: 5, name: user.name, points: user.points, streak: user.streak }
+            ].sort((a, b) => b.points - a.points);
+
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = '';
+            board.forEach(e => {
+                const row = document.createElement('tr');
+                const medals = ['🥇', '🥈', '🥉'];
+                row.innerHTML = `
+                    <td style="padding: 16px; border-bottom: 1px solid #334155;">${medals[e.rank - 1] || e.rank}</td>
+                    <td style="padding: 16px; border-bottom: 1px solid #334155; color: white;">${e.name}</td>
+                    <td style="padding: 16px; border-bottom: 1px solid #334155; text-align: right; color: #60a5fa;">${e.points.toLocaleString()}</td>
+                    <td style="padding: 16px; border-bottom: 1px solid #334155; text-align: right; color: #f59e0b;">${e.streak}🔥</td>
+                `;
+                if (e.name === user.name) row.style.background = '#334155';
+                tbody.appendChild(row);
+            });
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+    async function upgradeClick(plan) {
+    try {
+        const response = await fetch('/api/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ plan })
+        });
+
+        const { sessionId, error } = await response.json();
+
+        if (error) {
+            alert(`Erreur: ${error}`);
+            return;
+        }
+
+        // Redirige vers Stripe Checkout
+        window.location.href = `https://checkout.stripe.com/pay/${sessionId}`;
+    } catch (err) {
+        alert(`Erreur: ${err.message}`);
+    }
+}
+
+        window.addEventListener('DOMContentLoaded', loadUser);
+    </script>
+</body>
+</html>
