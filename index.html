@@ -509,6 +509,16 @@
             completedQuizzes: {}
         };
 
+// Check if returning from Stripe payment
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('premium') === 'true') {
+    user.isPremium = true;
+    localStorage.setItem('user', JSON.stringify(user));
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    alert('✅ Payment successful! You now have access to all premium modules.');
+}
+
         function loadUser() {
             const saved = localStorage.getItem('defiUser');
             if (saved) user = JSON.parse(saved);

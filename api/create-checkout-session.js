@@ -22,7 +22,7 @@ const priceId = plan === 'monthly'
         },
       ],
       mode: 'subscription',
-      success_url: `${req.headers.origin}/?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${req.headers.origin}/?premium=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/`,
     });
 
