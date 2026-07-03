@@ -700,7 +700,7 @@
         }
 
         // Utilise Stripe.js pour rediriger
-        const stripe = Stripe('pk_test_51TKiCoBi6rAFPbigi8dgeBjTnQ5vLAkXXy0DmKK6k1ETTbxsxmBj7nr87wQaXSrSmLBcbGs2V0n2Sw7sSEeR5X400UT6lPG48');
+        const stripe = Stripe('pk_test_51TKiCoBi6rAFPbigi8dggBjTnQ5vLAkXXy0DmKK6kTlETTbxsxmBj7nr87wQaXSrSmLBcbGs2V0n2Sw7sSEeR5X400UT6lPG48');
         await stripe.redirectToCheckout({ sessionId });
     } catch (err) {
         alert(`Erreur: ${err.message}`);
