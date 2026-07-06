@@ -15,19 +15,20 @@ export default async (req, res) => {
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   
-  let body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+  // Utilise req.rawBody pour Vercel
+  const body = req.rawBody || JSON.stringify(req.body);
 
   let event;
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
+    console.error('Webhook error:', err.message);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     
-    // Save to Supabase
     const { error } = await supabase.from('payments').insert([{
       email: session.customer_email,
       session_id: session.id,
