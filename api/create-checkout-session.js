@@ -1,4 +1,6 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async (req, res) => {
   if (req.method !== 'POST') {
@@ -8,9 +10,9 @@ export default async (req, res) => {
 
   const { plan } = req.body;
 
-const priceId = plan === 'monthly' 
-  ? 'price_1Tomb6Bi6rAFPbiggA6VfiA0'
-  : 'price_1TombQBi6rAFPbigySpnTrxY';
+  const priceId = plan === 'monthly' 
+    ? 'price_1Tomb6Bi6rAFPbiggA6VfiA0'
+    : 'price_1TombQBi6rAFPbigySpnTrxY';
 
   try {
     const session = await stripe.checkout.sessions.create({
