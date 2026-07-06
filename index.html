@@ -501,6 +501,25 @@
         ];
 
         let user = {
+
+// Check if returning from Stripe payment
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('premium') === 'true') {
+    user.isPremium = true;
+    localStorage.setItem('user', JSON.stringify(user));
+    window.history.replaceState({}, document.title, window.location.pathname);
+    
+    // Send confirmation email
+    const plan = localStorage.getItem('selectedPlan') || 'monthly';
+    fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email || 'user@example.com', plan })
+    }).catch(err => console.error('Email send failed:', err));
+    
+    alert('✅ Payment successful! You now have access to all premium modules.');
+}
+
             name: 'Learner',
             points: 0,
             streak: 0,
@@ -509,15 +528,6 @@
             completedQuizzes: {}
         };
 
-// Check if returning from Stripe payment
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('premium') === 'true') {
-    user.isPremium = true;
-    localStorage.setItem('user', JSON.stringify(user));
-    // Clean URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-    alert('✅ Payment successful! You now have access to all premium modules.');
-}
 
         function loadUser() {
             const saved = localStorage.getItem('defiUser');
@@ -701,7 +711,7 @@ if (urlParams.get('premium') === 'true') {
             },
             body: JSON.stringify({ plan })
         });
-
+localStorage.setItem('selectedPlan', plan);
         const { sessionId, error } = await response.json();
 
         if (error) {
